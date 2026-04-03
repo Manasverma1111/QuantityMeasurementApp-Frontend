@@ -1,10 +1,12 @@
-import {
-  Component, OnInit, signal, computed, inject
-} from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  FormBuilder, FormGroup, Validators, AbstractControl,
-  ValidationErrors, ReactiveFormsModule
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+  ReactiveFormsModule,
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
@@ -19,7 +21,7 @@ function passwordStrengthValidator(control: AbstractControl): ValidationErrors |
 }
 
 function passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
-  const pw      = group.get('password')?.value;
+  const pw = group.get('password')?.value;
   const confirm = group.get('confirmPassword')?.value;
   return pw && confirm && pw !== confirm ? { passwordMismatch: true } : null;
 }
@@ -29,42 +31,50 @@ function passwordMatchValidator(group: AbstractControl): ValidationErrors | null
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './auth.component.html',
-  styleUrls: ['./auth.component.scss']
+  styleUrls: ['./auth.component.scss'],
 })
 export class AuthComponent implements OnInit {
-  private fb          = inject(FormBuilder);
+  private fb = inject(FormBuilder);
   private authService = inject(AuthService);
-  private router      = inject(Router);
+  private router = inject(Router);
 
-  mode                 = signal<'login' | 'signup'>('login');
-  isLoading            = signal(false);
-  errorMsg             = signal('');
-  showPassword         = signal(false);
-  showConfirmPassword  = signal(false);
-  isLoginMode          = computed(() => this.mode() === 'login');
-  passwordStrength     = signal(0);
-  strengthLabel        = computed(() => (['', 'Weak', 'Fair', 'Good', 'Strong'])[this.passwordStrength()]);
-  strengthClass        = computed(() => (['', 'strength-weak', 'strength-fair', 'strength-good', 'strength-strong'])[this.passwordStrength()]);
+  mode = signal<'login' | 'signup'>('login');
+  isLoading = signal(false);
+  errorMsg = signal('');
+  showPassword = signal(false);
+  showConfirmPassword = signal(false);
+  isLoginMode = computed(() => this.mode() === 'login');
+  passwordStrength = signal(0);
+  strengthLabel = computed(() => ['', 'Weak', 'Fair', 'Good', 'Strong'][this.passwordStrength()]);
+  strengthClass = computed(
+    () =>
+      ['', 'strength-weak', 'strength-fair', 'strength-good', 'strength-strong'][
+        this.passwordStrength()
+      ],
+  );
 
-  loginForm!:  FormGroup;
+  loginForm!: FormGroup;
   signupForm!: FormGroup;
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
-      email:      ['', [Validators.required, Validators.email]],
-      password:   ['', [Validators.required, Validators.minLength(6)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
       rememberMe: [false],
     });
 
-    this.signupForm = this.fb.group({
-      name:            ['', [Validators.required, Validators.minLength(2)]],
-      email:           ['', [Validators.required, Validators.email]],
-      password:        ['', [Validators.required, passwordStrengthValidator]],
-      confirmPassword: ['', Validators.required],
-      agreeTerms:      [false, Validators.requiredTrue],
-    }, { validators: passwordMatchValidator });
+    this.signupForm = this.fb.group(
+      {
+        name: ['', [Validators.required, Validators.minLength(2)]],
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, passwordStrengthValidator]],
+        confirmPassword: ['', Validators.required],
+        agreeTerms: [false, Validators.requiredTrue],
+      },
+      { validators: passwordMatchValidator },
+    );
 
-    this.signupForm.get('password')?.valueChanges.subscribe(v => {
+    this.signupForm.get('password')?.valueChanges.subscribe((v) => {
       this.passwordStrength.set(this.calcStrength(v));
     });
   }
@@ -83,7 +93,10 @@ export class AuthComponent implements OnInit {
   }
 
   onLogin(): void {
-    if (this.loginForm.invalid) { this.loginForm.markAllAsTouched(); return; }
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
     this.isLoading.set(true);
     this.errorMsg.set('');
     this.authService.login(this.loginForm.value).subscribe({
@@ -97,7 +110,10 @@ export class AuthComponent implements OnInit {
   }
 
   onSignup(): void {
-    if (this.signupForm.invalid) { this.signupForm.markAllAsTouched(); return; }
+    if (this.signupForm.invalid) {
+      this.signupForm.markAllAsTouched();
+      return;
+    }
     this.isLoading.set(true);
     this.errorMsg.set('');
     const { name, email, password } = this.signupForm.value;
@@ -112,8 +128,8 @@ export class AuthComponent implements OnInit {
   }
 
   togglePassword(field: 'password' | 'confirm'): void {
-    if (field === 'password') this.showPassword.update(v => !v);
-    else this.showConfirmPassword.update(v => !v);
+    if (field === 'password') this.showPassword.update((v) => !v);
+    else this.showConfirmPassword.update((v) => !v);
   }
 
   hasError(form: FormGroup, field: string, error?: string): boolean {
@@ -123,8 +139,10 @@ export class AuthComponent implements OnInit {
   }
 
   hasFormError(form: FormGroup, error: string): boolean {
-    return !!(form.errors?.[error] &&
-      (form.get('confirmPassword')?.dirty || form.get('confirmPassword')?.touched));
+    return !!(
+      form.errors?.[error] &&
+      (form.get('confirmPassword')?.dirty || form.get('confirmPassword')?.touched)
+    );
   }
 
   private calcStrength(pw: string): number {
