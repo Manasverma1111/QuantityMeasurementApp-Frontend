@@ -1,0 +1,234 @@
+<div class="auth-shell">
+  <div class="bg-mesh"></div>
+  <div class="bg-grid"></div>
+
+  <!-- Left Panel -->
+  <aside class="brand-panel">
+    <div class="brand-inner">
+      <!-- <div class="logo">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <rect width="40" height="40" rx="12" fill="url(#logoGrad)"/>
+          <path d="M12 28L20 12L28 28" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14.5 23H25.5" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40">
+              <stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="logo-text">Axiom</span>
+      </div> -->
+
+      <div class="brand-copy">
+        <h1>Platform<br><em>Quantity Measurement</em></h1>
+        <p>Secure authentication with enterprise-grade JWT and Spring Security OAuth2.</p>
+      </div>
+
+      <ul class="feature-list">
+        <li>
+          <span class="feat-icon">🔐</span>
+          <div><strong>Spring Boot JWT</strong><span>Stateless, BCrypt-hashed, filter-based auth</span></div>
+        </li>
+        <li>
+          <span class="feat-icon">🚀</span>
+          <div><strong>Google OAuth2</strong><span>Server-side flow via Spring Security OAuth2</span></div>
+        </li>
+        <li>
+          <span class="feat-icon">🛡️</span>
+          <div><strong>Route Protection</strong><span>Angular guards + Spring Security filter chain</span></div>
+        </li>
+      </ul>
+
+      <!-- <div class="brand-footer">
+        <div class="avatars">
+          <img src="https://i.pravatar.cc/32?img=1" alt="user"/>
+          <img src="https://i.pravatar.cc/32?img=2" alt="user"/>
+          <img src="https://i.pravatar.cc/32?img=3" alt="user"/>
+          <img src="https://i.pravatar.cc/32?img=4" alt="user"/>
+        </div>
+        <p><strong>12,000+</strong> teams trust Axiom</p>
+      </div> -->
+    </div>
+  </aside>
+
+  <!-- Right Panel -->
+  <main class="form-panel">
+    <div class="form-card">
+
+      <!-- Tab Toggle -->
+      <div class="tab-bar">
+        <button class="tab-btn" [class.active]="isLoginMode()" (click)="switchMode('login')">Sign In</button>
+        <button class="tab-btn" [class.active]="!isLoginMode()" (click)="switchMode('signup')">Create Account</button>
+        <div class="tab-indicator" [class.right]="!isLoginMode()"></div>
+      </div>
+
+      <div class="form-header">
+        <h2>{{ isLoginMode() ? 'Welcome back' : 'Get started today' }}</h2>
+        <p>{{ isLoginMode() ? 'Sign in to your account to continue' : 'Create your account in seconds' }}</p>
+      </div>
+
+      <!-- Google OAuth2 Button — triggers Spring Boot redirect flow -->
+      <button class="google-btn" type="button" (click)="loginWithGoogle()">
+        <svg width="18" height="18" viewBox="0 0 48 48">
+          <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-4z"/>
+          <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.1 18.9 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4 24 4 16.3 4 9.7 8.4 6.3 14.7z"/>
+          <path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.5 35.5 26.9 36 24 36c-5.2 0-9.6-2.9-11.3-7.1l-6.6 4.8C9.6 39.5 16.3 44 24 44z"/>
+          <path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.2 5.2C41 35.3 44 30 44 24c0-1.3-.1-2.7-.4-4z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="divider"><span>or continue with email</span></div>
+
+      @if (errorMsg()) {
+        <div class="alert alert-error" role="alert">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 018 4zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+          </svg>
+          {{ errorMsg() }}
+        </div>
+      }
+
+      <!-- LOGIN FORM -->
+      @if (isLoginMode()) {
+        <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="auth-form" novalidate>
+
+          <div class="field-group">
+            <label for="login-email" class="field-label">Email address</label>
+            <div class="input-wrap" [class.is-error]="hasError(loginForm, 'email')">
+              <svg class="input-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M1 4a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H3a2 2 0 01-2-2V4zm11.354.146a.5.5 0 00-.708 0L8 7.793 4.354 4.146a.5.5 0 00-.708.708L7.293 8.5l-3.647 3.646a.5.5 0 00.708.708L8 9.207l3.646 3.647a.5.5 0 00.708-.708L9.207 8.5l3.147-3.646a.5.5 0 000-.708z"/>
+              </svg>
+              <input id="login-email" type="email" formControlName="email" placeholder="you@example.com" autocomplete="email"/>
+            </div>
+            @if (hasError(loginForm, 'email', 'required')) { <span class="field-error">Email is required</span> }
+            @else if (hasError(loginForm, 'email', 'email')) { <span class="field-error">Enter a valid email address</span> }
+          </div>
+
+          <div class="field-group">
+            <div class="label-row">
+              <label for="login-password" class="field-label">Password</label>
+              <a href="#" class="forgot-link">Forgot password?</a>
+            </div>
+            <div class="input-wrap" [class.is-error]="hasError(loginForm, 'password')">
+              <svg class="input-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 1a3.5 3.5 0 00-3.5 3.5V6H3a1 1 0 00-1 1v7a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1h-1.5V4.5A3.5 3.5 0 008 1zm-2 3.5a2 2 0 114 0V6H6V4.5zM8 10a1 1 0 110 2 1 1 0 010-2z"/>
+              </svg>
+              <input id="login-password" [type]="showPassword() ? 'text' : 'password'" formControlName="password" placeholder="••••••••" autocomplete="current-password"/>
+              <button type="button" class="toggle-pw" (click)="togglePassword('password')">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 011.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0114.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 011.172 8z"/>
+                  <path d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4.5 8a3.5 3.5 0 117 0 3.5 3.5 0 01-7 0z"/>
+                </svg>
+              </button>
+            </div>
+            @if (hasError(loginForm, 'password', 'required')) { <span class="field-error">Password is required</span> }
+          </div>
+
+          <div class="checkbox-row">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="rememberMe"/>
+              <span class="checkmark"></span>
+              Remember me
+            </label>
+          </div>
+
+          <button type="submit" class="submit-btn" [disabled]="isLoading()">
+            @if (isLoading()) { <span class="spinner"></span> Signing in… }
+            @else { Sign In <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M1 8a.5.5 0 01.5-.5h11.793l-3.147-3.146a.5.5 0 01.708-.708l4 4a.5.5 0 010 .708l-4 4a.5.5 0 01-.708-.708L13.293 8.5H1.5A.5.5 0 011 8z"/></svg> }
+          </button>
+        </form>
+      }
+
+      <!-- SIGNUP FORM -->
+      @if (!isLoginMode()) {
+        <form [formGroup]="signupForm" (ngSubmit)="onSignup()" class="auth-form" novalidate>
+
+          <div class="field-group">
+            <label for="signup-name" class="field-label">Full name</label>
+            <div class="input-wrap" [class.is-error]="hasError(signupForm, 'name')">
+              <svg class="input-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 8a3 3 0 100-6 3 3 0 000 6zm2-3a2 2 0 11-4 0 2 2 0 014 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+              </svg>
+              <input id="signup-name" type="text" formControlName="name" placeholder="Alex Johnson" autocomplete="name"/>
+            </div>
+            @if (hasError(signupForm, 'name', 'required')) { <span class="field-error">Full name is required</span> }
+            @else if (hasError(signupForm, 'name', 'minlength')) { <span class="field-error">Name must be at least 2 characters</span> }
+          </div>
+
+          <div class="field-group">
+            <label for="signup-email" class="field-label">Email address</label>
+            <div class="input-wrap" [class.is-error]="hasError(signupForm, 'email')">
+              <svg class="input-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M1 4a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H3a2 2 0 01-2-2V4zm11.354.146a.5.5 0 00-.708 0L8 7.793 4.354 4.146a.5.5 0 00-.708.708L7.293 8.5l-3.647 3.646a.5.5 0 00.708.708L8 9.207l3.646 3.647a.5.5 0 00.708-.708L9.207 8.5l3.147-3.646a.5.5 0 000-.708z"/>
+              </svg>
+              <input id="signup-email" type="email" formControlName="email" placeholder="you@example.com" autocomplete="email"/>
+            </div>
+            @if (hasError(signupForm, 'email', 'required')) { <span class="field-error">Email is required</span> }
+            @else if (hasError(signupForm, 'email', 'email')) { <span class="field-error">Enter a valid email address</span> }
+          </div>
+
+          <div class="field-group">
+            <label for="signup-password" class="field-label">Password</label>
+            <div class="input-wrap" [class.is-error]="hasError(signupForm, 'password')">
+              <svg class="input-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 1a3.5 3.5 0 00-3.5 3.5V6H3a1 1 0 00-1 1v7a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1h-1.5V4.5A3.5 3.5 0 008 1zm-2 3.5a2 2 0 114 0V6H6V4.5zM8 10a1 1 0 110 2 1 1 0 010-2z"/>
+              </svg>
+              <input id="signup-password" [type]="showPassword() ? 'text' : 'password'" formControlName="password" placeholder="Min 8 chars, uppercase & number" autocomplete="new-password"/>
+              <button type="button" class="toggle-pw" (click)="togglePassword('password')">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 011.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0114.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 011.172 8z"/><path d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4.5 8a3.5 3.5 0 117 0 3.5 3.5 0 01-7 0z"/></svg>
+              </button>
+            </div>
+            @if (hasError(signupForm, 'password', 'required')) { <span class="field-error">Password is required</span> }
+            @else if (hasError(signupForm, 'password', 'weakPassword')) { <span class="field-error">Must be 8+ chars with uppercase and number</span> }
+
+            @if (signupForm.get('password')?.value) {
+              <div class="strength-bar">
+                <div class="strength-track">
+                  <div class="strength-fill" [class]="strengthClass()" [style.width.%]="passwordStrength() * 25"></div>
+                </div>
+                <span class="strength-label" [class]="strengthClass()">{{ strengthLabel() }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="field-group">
+            <label for="signup-confirm" class="field-label">Confirm password</label>
+            <div class="input-wrap" [class.is-error]="hasError(signupForm, 'confirmPassword') || hasFormError(signupForm, 'passwordMismatch')">
+              <svg class="input-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 1a3.5 3.5 0 00-3.5 3.5V6H3a1 1 0 00-1 1v7a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1h-1.5V4.5A3.5 3.5 0 008 1zm-2 3.5a2 2 0 114 0V6H6V4.5zM8 10a1 1 0 110 2 1 1 0 010-2z"/>
+              </svg>
+              <input id="signup-confirm" [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword" placeholder="Repeat your password" autocomplete="new-password"/>
+              <button type="button" class="toggle-pw" (click)="togglePassword('confirm')">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 011.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0114.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 011.172 8z"/><path d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4.5 8a3.5 3.5 0 117 0 3.5 3.5 0 01-7 0z"/></svg>
+              </button>
+            </div>
+            @if (hasFormError(signupForm, 'passwordMismatch')) { <span class="field-error">Passwords do not match</span> }
+          </div>
+
+          <div class="checkbox-row">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="agreeTerms"/>
+              <span class="checkmark"></span>
+              I agree to the <a href="#" class="link">Terms of Service</a> and <a href="#" class="link">Privacy Policy</a>
+            </label>
+            @if (hasError(signupForm, 'agreeTerms', 'required')) { <span class="field-error">You must accept the terms</span> }
+          </div>
+
+          <button type="submit" class="submit-btn" [disabled]="isLoading()">
+            @if (isLoading()) { <span class="spinner"></span> Creating account… }
+            @else { Create Account <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M1 8a.5.5 0 01.5-.5h11.793l-3.147-3.146a.5.5 0 01.708-.708l4 4a.5.5 0 010 .708l-4 4a.5.5 0 01-.708-.708L13.293 8.5H1.5A.5.5 0 011 8z"/></svg> }
+          </button>
+        </form>
+      }
+
+      <p class="switch-mode">
+        {{ isLoginMode() ? "Don't have an account?" : 'Already have an account?' }}
+        <button class="switch-btn" (click)="switchMode(isLoginMode() ? 'signup' : 'login')">
+          {{ isLoginMode() ? 'Sign up' : 'Sign in' }}
+        </button>
+      </p>
+
+    </div>
+  </main>
+</div>
